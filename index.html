@@ -5,20 +5,41 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Goalie Tracker</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1565c0">
+    <meta name="theme-color" content="#211f1b">
     <style>
+      :root {
+        --logo-charcoal: #211f1b;
+        --logo-burgundy: #801d24;
+        --logo-gold: #d7c27b;
+        --logo-cream: #f3edda;
+      }
       body {
         font-family: Arial, sans-serif;
         max-width: 600px;
         margin: auto;
         padding: 16px;
-        background: #f4f6f8;
+        background: var(--logo-cream);
+        color: var(--logo-charcoal);
+      }
+      .page-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .page-header img {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+      }
+      .page-header h1 {
+        color: var(--logo-charcoal);
       }
       .card {
-        background: #fff;
+        background: #fffaf0;
         padding: 16px;
         border-radius: 12px;
         margin: 10px 0;
+        border: 1px solid var(--logo-gold);
       }
       button {
         width: 100%;
@@ -29,19 +50,28 @@
         border-radius: 10px;
       }
       .shot {
-        background: #1565c0;
+        background: var(--logo-burgundy);
         color: #fff;
       }
       .goal {
-        background: #c62828;
-        color: #fff;
+        background: var(--logo-gold);
+        color: var(--logo-charcoal);
       }
       .small {
-        background: #ddd;
+        background: #e8dfc4;
+        color: var(--logo-charcoal);
+      }
+      .counter-adjustments {
+        display: flex;
+        gap: 8px;
+      }
+      .counter-adjustments button {
+        flex: 1;
       }
       .stat {
         font-size: 42px;
         font-weight: bold;
+        color: var(--logo-burgundy);
       }
       #history {
         white-space: pre-line;
@@ -64,7 +94,10 @@
     </style>
   </head>
   <body>
-    <h1>🏒 Goalie Tracker</h1>
+    <header class="page-header">
+      <img src="logo.png" alt="Dynamik Goaltending logo">
+      <h1>Goalie Tracker</h1>
+    </header>
     <div class="card">
       <input id="opp" placeholder="Opponent" style="width: 100%; padding: 10px">
     </div>
@@ -72,18 +105,23 @@
       <div>Shots</div>
       <div id="shots" class="stat">0</div>
       <button class="shot" onclick="addShot()">+ SHOT</button>
+      <div class="counter-adjustments">
+        <button class="small" onclick="removeShot()">- SHOT</button>
+      </div>
     </div>
     <div class="card">
       <div>Goals</div>
       <div id="goals" class="stat">0</div>
       <button class="goal" onclick="addGoal()">+ GOAL</button>
+      <div class="counter-adjustments">
+        <button class="small" onclick="removeGoal()">- GOAL</button>
+      </div>
     </div>
     <div class="card">
       <div>Saves: <span id="saves">0</span></div>
       <div>Save %: <span id="svp">1.000</span></div>
     </div>
     <div class="card">
-      <button class="small" onclick="undo()">UNDO</button>
       <button class="small" onclick="saveGame()">SAVE GAME</button>
     </div>
     <div class="card">
@@ -92,7 +130,7 @@
       <button class="small" onclick="clearHistory()">CLEAR SEASON LOGS</button>
     </div>
     <script>
-      let shots = 0, goals = 0, last = '';
+      let shots = 0, goals = 0;
 
       function render() {
         const saves = shots - goals;
@@ -105,23 +143,21 @@
 
       function addShot() {
         shots++;
-        last = 'shot';
         render();
       }
 
       function addGoal() {
-        shots++;
         goals++;
-        last = 'goal';
         render();
       }
 
-      function undo() {
-        if (last === 'shot' && shots > 0) shots--;
-        if (last === 'goal' && shots > 0 && goals > 0) {
-          shots--;
-          goals--;
-        }
+      function removeShot() {
+        if (shots > 0) shots--;
+        render();
+      }
+
+      function removeGoal() {
+        if (goals > 0) goals--;
         render();
       }
 
