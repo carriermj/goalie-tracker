@@ -7,6 +7,9 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#211f1b">
     <style>
+      * {
+        box-sizing: border-box;
+      }
       :root {
         --logo-charcoal: #211f1b;
         --logo-burgundy: #801d24;
@@ -15,7 +18,7 @@
       }
       body {
         font-family: Arial, sans-serif;
-        max-width: 600px;
+        width: min(100%, 632px);
         margin: auto;
         padding: 16px;
         background: var(--logo-cream);
@@ -25,14 +28,17 @@
         display: flex;
         align-items: center;
         gap: 12px;
+        margin-bottom: 12px;
       }
       .page-header img {
         width: 72px;
         height: 72px;
+        flex: 0 0 auto;
         border-radius: 50%;
       }
       .page-header h1 {
         color: var(--logo-charcoal);
+        font-size: clamp(24px, 7vw, 32px);
       }
       .card {
         background: #fffaf0;
@@ -43,11 +49,14 @@
       }
       button {
         width: 100%;
-        padding: 18px;
+        min-height: 48px;
+        padding: 12px;
         margin: 6px 0;
-        font-size: 22px;
+        font-size: 18px;
+        font-weight: bold;
         border: none;
         border-radius: 10px;
+        touch-action: manipulation;
       }
       .shot {
         background: var(--logo-burgundy);
@@ -67,6 +76,8 @@
       }
       .counter-adjustments button {
         flex: 1;
+        width: 0;
+        margin: 6px 0;
       }
       .stat {
         font-size: 42px;
@@ -84,12 +95,60 @@
       }
       .game-entry span {
         flex: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
       }
       .delete-game {
         width: auto;
+        flex: 0 0 auto;
         padding: 8px 12px;
         margin: 0;
         font-size: 16px;
+      }
+      .game-actions {
+        display: flex;
+        flex: 0 0 auto;
+        gap: 6px;
+      }
+      .game-actions button {
+        width: auto;
+        min-height: 44px;
+        padding: 8px 10px;
+        margin: 0;
+        font-size: 14px;
+      }
+      .opponent-input {
+        display: block;
+        width: 100%;
+        min-height: 48px;
+        margin: 0 auto;
+        padding: 12px;
+        border: 1px solid var(--logo-gold);
+        border-radius: 8px;
+        font: inherit;
+        font-size: 16px;
+      }
+      @media (max-width: 400px) {
+        body {
+          padding: 10px;
+        }
+        .card {
+          padding: 12px;
+        }
+        .page-header img {
+          width: 60px;
+          height: 60px;
+        }
+        .counter-adjustments {
+          gap: 6px;
+        }
+        .game-entry {
+          align-items: stretch;
+          flex-direction: column;
+        }
+        .game-actions {
+          justify-content: flex-end;
+        }
       }
     </style>
   </head>
@@ -99,7 +158,7 @@
       <h1>Goalie Tracker</h1>
     </header>
     <div class="card">
-      <input id="opp" placeholder="Opponent" style="width: 100%; padding: 10px">
+      <input id="opp" class="opponent-input" placeholder="Opponent" aria-label="Opponent">
     </div>
     <div class="card">
       <div>Shots</div>
@@ -170,6 +229,7 @@
           goals
         });
         localStorage.setItem('games', JSON.stringify(games));
+        document.getElementById('opp').value = '';
         shots = 0;
         goals = 0;
         render();
@@ -189,15 +249,46 @@
           entry.className = 'game-entry';
           const details = document.createElement('span');
           details.textContent = `${game.date} - ${game.opp} | ${game.shots} shots, ${game.goals} goals`;
+          const actions = document.createElement('div');
+          actions.className = 'game-actions';
+          const downloadButton = document.createElement('button');
+          downloadButton.className = 'small';
+          downloadButton.type = 'button';
+          downloadButton.textContent = 'DOWNLOAD CSV';
+          downloadButton.setAttribute('aria-label', `Download CSV for game against ${game.opp} on ${game.date}`);
+          downloadButton.addEventListener('click', () => downloadGameCsv(game));
           const deleteButton = document.createElement('button');
           deleteButton.className = 'small delete-game';
           deleteButton.type = 'button';
           deleteButton.textContent = 'DELETE';
           deleteButton.setAttribute('aria-label', `Delete game against ${game.opp} on ${game.date}`);
           deleteButton.addEventListener('click', () => deleteGame(index));
-          entry.append(details, deleteButton);
+          actions.append(downloadButton, deleteButton);
+          entry.append(details, actions);
           history.append(entry);
         });
+      }
+
+      function downloadGameCsv(game) {
+        const saves = game.shots - game.goals;
+        const savePercentage = game.shots ? (saves / game.shots).toFixed(3) : '1.000';
+        const rows = [
+          ['Date', 'Opponent', 'Shots', 'Goals', 'Saves', 'Save Percentage'],
+          [game.date, game.opp, game.shots, game.goals, saves, savePercentage]
+        ];
+        const csv = rows.map(row => row.map(value => {
+          const escaped = String(value).replace(/"/g, '""');
+          return `"${escaped}"`;
+        }).join(',')).join('\r\n');
+        const blob = new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const opponent = String(game.opp).trim().replace(/[^\w-]+/g, '-').replace(/^-|-$/g, '') || 'game';
+        const date = String(game.date).replace(/[^\w-]+/g, '-');
+        link.href = url;
+        link.download = `${opponent}-${date}.csv`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
 
       function deleteGame(index) {
