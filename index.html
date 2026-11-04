@@ -172,7 +172,7 @@
       <div>Goals</div>
       <div id="goals" class="stat">0</div>
       <div class="counter-adjustments">
-        <button class="goal" onclick="addGoal()">+ GOAL</button>
+        <button id="add-goal" class="goal" onclick="addGoal()">+ GOAL</button>
         <button class="small" onclick="removeGoal()">- GOAL</button>
       </div>
     </div>
@@ -197,6 +197,7 @@
         document.getElementById('goals').textContent = goals;
         document.getElementById('saves').textContent = saves;
         document.getElementById('svp').textContent = shots ? (saves / shots).toFixed(3) : '1.000';
+        document.getElementById('add-goal').disabled = shots === 0;
         loadHistory();
       }
 
@@ -206,12 +207,13 @@
       }
 
       function addGoal() {
+        if (shots === 0) return;
         goals++;
         render();
       }
 
       function removeShot() {
-        if (shots > 0) shots--;
+        if (shots > goals) shots--;
         render();
       }
 
