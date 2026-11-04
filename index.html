@@ -85,30 +85,26 @@
       .small { background: var(--muted-button); color: var(--logo-charcoal); }
       .theme-toggle {
         position: relative;
-        width: 68px;
-        height: 40px;
-        min-height: 40px;
-        flex: 0 0 68px;
+        width: 64px;
+        height: 36px;
+        min-height: 36px;
+        flex: 0 0 64px;
         margin: 0;
         padding: 0;
         overflow: hidden;
         border: 2px solid var(--logo-burgundy);
         border-radius: 999px;
         background: var(--logo-cream);
-        color: var(--logo-charcoal);
-        display: inline-flex;
-        align-items: center;
-        justify-content: space-between;
         cursor: pointer;
         transition: background-color 240ms ease, border-color 240ms ease;
       }
       .theme-toggle::before {
         position: absolute;
         z-index: 1;
-        top: 3px;
-        left: 3px;
-        width: 30px;
-        height: 30px;
+        top: 2px;
+        left: 2px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
         background: var(--logo-burgundy);
         content: "";
@@ -117,26 +113,31 @@
       .theme-toggle[aria-checked="true"] {
         border-color: var(--logo-gold);
         background: var(--logo-charcoal);
-        color: var(--logo-gold);
       }
       .theme-toggle[aria-checked="true"]::before {
         transform: translateX(28px);
         background: var(--logo-gold);
       }
       .theme-icon {
+        position: absolute;
         z-index: 2;
-        width: 30px;
-        text-align: center;
-        font-size: 17px;
-        line-height: 1;
+        top: 50%;
+        left: 4px;
+        display: block;
+        width: 24px;
+        height: 24px;
         pointer-events: none;
-        transition: color 240ms ease;
+        transform: translateY(-50%);
+        transition: transform 240ms ease, color 240ms ease;
       }
       .theme-icon-moon { color: var(--logo-cream); }
-      .theme-icon-sun { display: none; color: var(--logo-burgundy); }
-      .theme-icon-sun svg { display: block; width: 17px; height: 17px; margin: auto; }
+      .theme-icon-sun { display: none; color: var(--logo-charcoal); }
+      .theme-icon-sun svg { display: block; width: 18px; height: 18px; margin: 3px auto; }
       .theme-toggle[aria-checked="true"] .theme-icon-moon { display: none; }
-      .theme-toggle[aria-checked="true"] .theme-icon-sun { display: block; color: var(--logo-charcoal); }
+      .theme-toggle[aria-checked="true"] .theme-icon-sun {
+        display: block;
+        transform: translate(28px, -50%);
+      }
       .counter-adjustments { display: flex; gap: 8px; }
       .counter-adjustments button { flex: 1; width: 0; margin: 6px 0; }
       .stat {
