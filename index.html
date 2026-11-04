@@ -7,9 +7,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#211f1b">
     <style>
-      * {
-        box-sizing: border-box;
-      }
+      * { box-sizing: border-box; }
       :root {
         --logo-charcoal: #211f1b;
         --logo-burgundy: #801d24;
@@ -17,6 +15,7 @@
         --logo-cream: #ead4d2;
       }
       body {
+        color-scheme: light;
         --page-background: var(--logo-cream);
         --surface-background: #fffaf0;
         --text-color: var(--logo-charcoal);
@@ -27,7 +26,7 @@
         padding: 16px;
         background: var(--page-background);
         color: var(--text-color);
-        transition: background-color 160ms ease, color 160ms ease;
+        transition: background-color 240ms ease, color 240ms ease;
       }
       body.dark-mode {
         color-scheme: dark;
@@ -52,6 +51,7 @@
         flex: 1;
         color: var(--text-color);
         font-size: clamp(24px, 7vw, 32px);
+        transition: color 240ms ease;
       }
       .card {
         background: var(--surface-background);
@@ -59,6 +59,7 @@
         border-radius: 12px;
         margin: 10px 0;
         border: 1px solid var(--logo-gold);
+        transition: background-color 240ms ease, border-color 240ms ease, color 240ms ease;
       }
       button {
         width: 100%;
@@ -71,27 +72,16 @@
         border-radius: 10px;
         touch-action: manipulation;
         cursor: pointer;
+        transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease;
       }
       button:focus-visible, input:focus-visible {
         outline: 3px solid var(--logo-gold);
         outline-offset: 2px;
       }
-      button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-      .shot {
-        background: var(--logo-burgundy);
-        color: #fff;
-      }
-      .goal {
-        background: var(--logo-gold);
-        color: var(--logo-charcoal);
-      }
-      .small {
-        background: var(--muted-button);
-        color: var(--logo-charcoal);
-      }
+      button:disabled { opacity: 0.6; cursor: not-allowed; }
+      .shot { background: var(--logo-burgundy); color: #fff; }
+      .goal { background: var(--logo-gold); color: var(--logo-charcoal); }
+      .small { background: var(--muted-button); color: var(--logo-charcoal); }
       .theme-toggle {
         position: relative;
         width: 68px;
@@ -109,7 +99,7 @@
         align-items: center;
         justify-content: space-between;
         cursor: pointer;
-        transition: background-color 180ms ease, border-color 180ms ease;
+        transition: background-color 240ms ease, border-color 240ms ease;
       }
       .theme-toggle::before {
         position: absolute;
@@ -121,14 +111,14 @@
         border-radius: 50%;
         background: var(--logo-burgundy);
         content: "";
-        transition: transform 180ms ease, background-color 180ms ease;
+        transition: transform 240ms ease, background-color 240ms ease;
       }
-      .theme-toggle[aria-pressed="true"] {
+      .theme-toggle[aria-checked="true"] {
         border-color: var(--logo-gold);
         background: var(--logo-charcoal);
         color: var(--logo-gold);
       }
-      .theme-toggle[aria-pressed="true"]::before {
+      .theme-toggle[aria-checked="true"]::before {
         transform: translateX(28px);
         background: var(--logo-gold);
       }
@@ -139,50 +129,24 @@
         font-size: 17px;
         line-height: 1;
         pointer-events: none;
+        transition: color 240ms ease;
       }
-      .theme-icon-moon {
-        color: var(--logo-cream);
-      }
-      .theme-icon-sun {
-        color: var(--logo-burgundy);
-      }
-      .theme-toggle[aria-pressed="true"] .theme-icon-moon {
-        color: var(--logo-charcoal);
-      }
-      .theme-toggle[aria-pressed="true"] .theme-icon-sun {
-        color: var(--logo-charcoal);
-      }
-      .counter-adjustments {
-        display: flex;
-        gap: 8px;
-      }
-      .counter-adjustments button {
-        flex: 1;
-        width: 0;
-        margin: 6px 0;
-      }
+      .theme-icon-moon { color: var(--logo-cream); }
+      .theme-icon-sun { color: var(--logo-burgundy); }
+      .theme-toggle[aria-checked="true"] .theme-icon-moon,
+      .theme-toggle[aria-checked="true"] .theme-icon-sun { color: var(--logo-charcoal); }
+      .counter-adjustments { display: flex; gap: 8px; }
+      .counter-adjustments button { flex: 1; width: 0; margin: 6px 0; }
       .stat {
         font-size: 42px;
         font-weight: bold;
         color: var(--logo-burgundy);
+        transition: color 240ms ease;
       }
-      body.dark-mode .stat {
-        color: var(--logo-gold);
-      }
-      #history {
-        white-space: pre-line;
-      }
-      .game-entry {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin: 8px 0;
-      }
-      .game-entry span {
-        flex: 1;
-        min-width: 0;
-        overflow-wrap: anywhere;
-      }
+      body.dark-mode .stat { color: var(--logo-gold); }
+      #history { white-space: pre-line; }
+      .game-entry { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+      .game-entry span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
       .delete-game {
         width: auto;
         flex: 0 0 auto;
@@ -190,11 +154,7 @@
         margin: 0;
         font-size: 16px;
       }
-      .game-actions {
-        display: flex;
-        flex: 0 0 auto;
-        gap: 6px;
-      }
+      .game-actions { display: flex; flex: 0 0 auto; gap: 6px; }
       .game-actions button {
         width: auto;
         min-height: 44px;
@@ -214,37 +174,19 @@
         color: var(--text-color);
         font: inherit;
         font-size: 16px;
+        transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease;
       }
-      .opponent-input::placeholder {
-        color: var(--text-color);
-        opacity: 0.7;
-      }
+      .opponent-input::placeholder { color: var(--text-color); opacity: 0.7; }
       @media (max-width: 400px) {
-        body {
-          padding: 10px;
-        }
-        .card {
-          padding: 12px;
-        }
-        .page-header img {
-          width: 60px;
-          height: 60px;
-        }
-        .counter-adjustments {
-          gap: 6px;
-        }
-        .game-entry {
-          align-items: stretch;
-          flex-direction: column;
-        }
-        .game-actions {
-          justify-content: flex-end;
-        }
+        body { padding: 10px; }
+        .card { padding: 12px; }
+        .page-header img { width: 60px; height: 60px; }
+        .counter-adjustments { gap: 6px; }
+        .game-entry { align-items: stretch; flex-direction: column; }
+        .game-actions { justify-content: flex-end; }
       }
       @media (prefers-reduced-motion: reduce) {
-        body, .theme-toggle, .theme-toggle::before {
-          transition: none;
-        }
+        *, *::before, *::after { transition-duration: 0.01ms !important; }
       }
     </style>
   </head>
@@ -314,26 +256,10 @@
         loadHistory();
       }
 
-      function addShot() {
-        shots++;
-        render();
-      }
-
-      function addGoal() {
-        if (goals >= shots) return;
-        goals++;
-        render();
-      }
-
-      function removeShot() {
-        if (shots > goals) shots--;
-        render();
-      }
-
-      function removeGoal() {
-        if (goals > 0) goals--;
-        render();
-      }
+      function addShot() { shots++; render(); }
+      function addGoal() { if (goals >= shots) return; goals++; render(); }
+      function removeShot() { if (shots > goals) shots--; render(); }
+      function removeGoal() { if (goals > 0) goals--; render(); }
 
       function saveGame() {
         const games = JSON.parse(localStorage.getItem('games') || '[]');
@@ -358,7 +284,6 @@
           history.textContent = 'No saved games yet.';
           return;
         }
-
         games.forEach((game, index) => {
           const entry = document.createElement('div');
           entry.className = 'game-entry';
@@ -412,11 +337,8 @@
         if (!game) return;
         if (!confirm(`Delete the game against ${game.opp} on ${game.date}? This cannot be undone.`)) return;
         games.splice(index, 1);
-        if (games.length) {
-          localStorage.setItem('games', JSON.stringify(games));
-        } else {
-          localStorage.removeItem('games');
-        }
+        if (games.length) localStorage.setItem('games', JSON.stringify(games));
+        else localStorage.removeItem('games');
         render();
       }
 
@@ -428,12 +350,8 @@
         render();
       }
 
-      if (document.body) {
-        applyTheme(localStorage.getItem('goalie-tracker-theme') === 'dark');
-      }
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('service-worker.js');
-      }
+      applyTheme(localStorage.getItem('goalie-tracker-theme') === 'dark');
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js');
       render();
     </script>
   </body>
