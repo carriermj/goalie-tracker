@@ -196,7 +196,7 @@
         document.getElementById('shots').textContent = shots;
         document.getElementById('goals').textContent = goals;
         document.getElementById('saves').textContent = saves;
-        document.getElementById('svp').textContent = shots ? (saves / shots).toFixed(3) : '1.000';
+        document.getElementById('svp').textContent = shots ? (saves / shots).toFixed(3) : '0.000';
         document.getElementById('add-goal').disabled = goals >= shots;
         loadHistory();
       }
@@ -273,7 +273,7 @@
 
       function downloadGameCsv(game) {
         const saves = game.shots - game.goals;
-        const savePercentage = game.shots ? (saves / game.shots).toFixed(3) : '1.000';
+        const savePercentage = game.shots ? (saves / game.shots).toFixed(3) : '0.000';
         const rows = [
           ['Date', 'Opponent', 'Shots', 'Goals', 'Saves', 'Save Percentage'],
           [game.date, game.opp, game.shots, game.goals, saves, savePercentage]

@@ -36,6 +36,7 @@ function createApp() {
 test('goals cannot exceed shots', () => {
   const { context, elements } = createApp();
 
+  assert.equal(elements.get('svp').textContent, '0.000');
   assert.equal(elements.get('add-goal').disabled, true);
   context.addGoal();
   assert.equal(elements.get('goals').textContent, 0);
