@@ -33,7 +33,7 @@ function createApp() {
   return { context, elements };
 }
 
-test('adding a goal is blocked at zero shots and enabled after a shot', () => {
+test('goals cannot exceed shots', () => {
   const { context, elements } = createApp();
 
   assert.equal(elements.get('add-goal').disabled, true);
@@ -44,6 +44,15 @@ test('adding a goal is blocked at zero shots and enabled after a shot', () => {
   assert.equal(elements.get('add-goal').disabled, false);
   context.addGoal();
   assert.equal(elements.get('goals').textContent, 1);
+  assert.equal(elements.get('add-goal').disabled, true);
+
+  context.addGoal();
+  assert.equal(elements.get('goals').textContent, 1);
+
+  context.addShot();
+  assert.equal(elements.get('add-goal').disabled, false);
+  context.addGoal();
+  assert.equal(elements.get('goals').textContent, 2);
 });
 
 test('shots cannot be reduced below the number of goals', () => {

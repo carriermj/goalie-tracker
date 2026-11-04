@@ -197,7 +197,7 @@
         document.getElementById('goals').textContent = goals;
         document.getElementById('saves').textContent = saves;
         document.getElementById('svp').textContent = shots ? (saves / shots).toFixed(3) : '1.000';
-        document.getElementById('add-goal').disabled = shots === 0;
+        document.getElementById('add-goal').disabled = goals >= shots;
         loadHistory();
       }
 
@@ -207,7 +207,7 @@
       }
 
       function addGoal() {
-        if (shots === 0) return;
+        if (goals >= shots) return;
         goals++;
         render();
       }
