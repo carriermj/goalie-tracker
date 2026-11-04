@@ -83,58 +83,19 @@
       .goal { background: var(--logo-gold); color: var(--logo-charcoal); }
       .small { background: var(--muted-button); color: var(--logo-charcoal); }
       .theme-toggle {
-        position: relative;
-        width: 68px;
-        height: 40px;
-        min-height: 40px;
-        flex: 0 0 68px;
+        width: auto;
+        min-height: 44px;
+        flex: 0 0 auto;
         margin: 0;
-        padding: 0;
-        overflow: hidden;
-        border: 2px solid var(--logo-burgundy);
-        border-radius: 999px;
-        background: var(--logo-cream);
-        color: var(--logo-charcoal);
+        padding: 8px 12px;
+        background: var(--logo-burgundy);
+        color: #fff;
+        font-size: 20px;
+        line-height: 1;
         display: inline-flex;
         align-items: center;
-        justify-content: space-between;
-        cursor: pointer;
-        transition: background-color 240ms ease, border-color 240ms ease;
+        justify-content: center;
       }
-      .theme-toggle::before {
-        position: absolute;
-        z-index: 1;
-        top: 3px;
-        left: 3px;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: var(--logo-burgundy);
-        content: "";
-        transition: transform 240ms ease, background-color 240ms ease;
-      }
-      .theme-toggle[aria-checked="true"] {
-        border-color: var(--logo-gold);
-        background: var(--logo-charcoal);
-        color: var(--logo-gold);
-      }
-      .theme-toggle[aria-checked="true"]::before {
-        transform: translateX(28px);
-        background: var(--logo-gold);
-      }
-      .theme-icon {
-        z-index: 2;
-        width: 30px;
-        text-align: center;
-        font-size: 17px;
-        line-height: 1;
-        pointer-events: none;
-        transition: color 240ms ease;
-      }
-      .theme-icon-moon { color: var(--logo-cream); }
-      .theme-icon-sun { color: var(--logo-burgundy); }
-      .theme-toggle[aria-checked="true"] .theme-icon-moon,
-      .theme-toggle[aria-checked="true"] .theme-icon-sun { color: var(--logo-charcoal); }
       .counter-adjustments { display: flex; gap: 8px; }
       .counter-adjustments button { flex: 1; width: 0; margin: 6px 0; }
       .stat {
@@ -194,7 +155,7 @@
     <header class="page-header">
       <img src="logo.png" alt="Dynamik Goaltending logo">
       <h1>Goalie Tracker</h1>
-      <button id="theme-toggle" class="theme-toggle" type="button" role="switch" aria-label="Dark mode" aria-checked="false" onclick="toggleTheme()"><span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span><span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span></button>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" aria-pressed="false" onclick="toggleTheme()">☾</button>
     </header>
     <div class="card">
       <input id="opp" class="opponent-input" placeholder="Opponent" aria-label="Opponent">
@@ -235,8 +196,9 @@
         document.body.classList.toggle('dark-mode', isDark);
         const toggle = document.getElementById('theme-toggle');
         if (toggle) {
-          toggle.setAttribute('aria-checked', String(isDark));
-          toggle.setAttribute('aria-label', isDark ? 'Dark mode on' : 'Dark mode off');
+          toggle.setAttribute('aria-pressed', String(isDark));
+          toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+          toggle.textContent = isDark ? '☀︎' : '☾';
         }
       }
 
