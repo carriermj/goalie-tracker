@@ -100,7 +100,11 @@
         padding: 8px 12px;
         background: var(--logo-burgundy);
         color: #fff;
-        font-size: 14px;
+        font-size: 20px;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
       .counter-adjustments {
         display: flex;
@@ -182,7 +186,7 @@
         }
         .theme-toggle {
           padding: 8px;
-          font-size: 12px;
+          font-size: 18px;
         }
         .counter-adjustments {
           gap: 6px;
@@ -206,7 +210,7 @@
     <header class="page-header">
       <img src="logo.png" alt="Dynamik Goaltending logo">
       <h1>Goalie Tracker</h1>
-      <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" onclick="toggleTheme()">Dark mode</button>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" aria-pressed="false" onclick="toggleTheme()">☾</button>
     </header>
     <div class="card">
       <input id="opp" class="opponent-input" placeholder="Opponent" aria-label="Opponent">
@@ -248,7 +252,8 @@
         const toggle = document.getElementById('theme-toggle');
         if (toggle) {
           toggle.setAttribute('aria-pressed', String(isDark));
-          toggle.textContent = isDark ? 'Light mode' : 'Dark mode';
+          toggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+          toggle.textContent = isDark ? '☀︎' : '☾';
         }
       }
 
