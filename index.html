@@ -17,12 +17,24 @@
         --logo-cream: #ead4d2;
       }
       body {
+        --page-background: var(--logo-cream);
+        --surface-background: #fffaf0;
+        --text-color: var(--logo-charcoal);
+        --muted-button: #e8dfc4;
         font-family: Arial, sans-serif;
         width: min(100%, 632px);
         margin: auto;
         padding: 16px;
-        background: var(--logo-cream);
-        color: var(--logo-charcoal);
+        background: var(--page-background);
+        color: var(--text-color);
+        transition: background-color 160ms ease, color 160ms ease;
+      }
+      body.dark-mode {
+        color-scheme: dark;
+        --page-background: var(--logo-charcoal);
+        --surface-background: #302b27;
+        --text-color: var(--logo-cream);
+        --muted-button: var(--logo-gold);
       }
       .page-header {
         display: flex;
@@ -37,11 +49,12 @@
         border-radius: 50%;
       }
       .page-header h1 {
-        color: var(--logo-charcoal);
+        flex: 1;
+        color: var(--text-color);
         font-size: clamp(24px, 7vw, 32px);
       }
       .card {
-        background: #fffaf0;
+        background: var(--surface-background);
         padding: 16px;
         border-radius: 12px;
         margin: 10px 0;
@@ -57,6 +70,15 @@
         border: none;
         border-radius: 10px;
         touch-action: manipulation;
+        cursor: pointer;
+      }
+      button:focus-visible, input:focus-visible {
+        outline: 3px solid var(--logo-gold);
+        outline-offset: 2px;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
       }
       .shot {
         background: var(--logo-burgundy);
@@ -67,8 +89,18 @@
         color: var(--logo-charcoal);
       }
       .small {
-        background: #e8dfc4;
+        background: var(--muted-button);
         color: var(--logo-charcoal);
+      }
+      .theme-toggle {
+        width: auto;
+        min-height: 44px;
+        flex: 0 0 auto;
+        margin: 0;
+        padding: 8px 12px;
+        background: var(--logo-burgundy);
+        color: #fff;
+        font-size: 14px;
       }
       .counter-adjustments {
         display: flex;
@@ -83,6 +115,9 @@
         font-size: 42px;
         font-weight: bold;
         color: var(--logo-burgundy);
+      }
+      body.dark-mode .stat {
+        color: var(--logo-gold);
       }
       #history {
         white-space: pre-line;
@@ -125,8 +160,14 @@
         padding: 12px;
         border: 1px solid var(--logo-gold);
         border-radius: 8px;
+        background: var(--surface-background);
+        color: var(--text-color);
         font: inherit;
         font-size: 16px;
+      }
+      .opponent-input::placeholder {
+        color: var(--text-color);
+        opacity: 0.7;
       }
       @media (max-width: 400px) {
         body {
@@ -139,6 +180,10 @@
           width: 60px;
           height: 60px;
         }
+        .theme-toggle {
+          padding: 8px;
+          font-size: 12px;
+        }
         .counter-adjustments {
           gap: 6px;
         }
@@ -150,12 +195,18 @@
           justify-content: flex-end;
         }
       }
+      @media (prefers-reduced-motion: reduce) {
+        body {
+          transition: none;
+        }
+      }
     </style>
   </head>
   <body>
     <header class="page-header">
       <img src="logo.png" alt="Dynamik Goaltending logo">
       <h1>Goalie Tracker</h1>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" onclick="toggleTheme()">Dark mode</button>
     </header>
     <div class="card">
       <input id="opp" class="opponent-input" placeholder="Opponent" aria-label="Opponent">
@@ -190,6 +241,22 @@
     </div>
     <script>
       let shots = 0, goals = 0;
+
+      function applyTheme(isDark) {
+        if (!document.body) return;
+        document.body.classList.toggle('dark-mode', isDark);
+        const toggle = document.getElementById('theme-toggle');
+        if (toggle) {
+          toggle.setAttribute('aria-pressed', String(isDark));
+          toggle.textContent = isDark ? 'Light mode' : 'Dark mode';
+        }
+      }
+
+      function toggleTheme() {
+        const isDark = !document.body.classList.contains('dark-mode');
+        applyTheme(isDark);
+        localStorage.setItem('goalie-tracker-theme', isDark ? 'dark' : 'light');
+      }
 
       function render() {
         const saves = shots - goals;
@@ -315,6 +382,9 @@
         render();
       }
 
+      if (document.body) {
+        applyTheme(localStorage.getItem('goalie-tracker-theme') === 'dark');
+      }
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('service-worker.js');
       }
