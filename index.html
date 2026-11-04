@@ -163,6 +163,21 @@
         margin: 0;
         font-size: 14px;
       }
+      .period-controls {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .period-button {
+        width: 100%;
+        min-height: 44px;
+        padding: 8px 10px;
+        margin: 0;
+        font-size: 16px;
+        background: var(--muted-button);
+        color: var(--logo-charcoal);
+      }
+      .period-button.active { background: var(--logo-burgundy); color: #fff; }
       .opponent-input {
         display: block;
         width: 100%;
@@ -195,10 +210,18 @@
     <header class="page-header">
       <img src="logo.png" alt="Dynamik Goaltending logo">
       <h1>Goalie Tracker</h1>
-      <button id="theme-toggle" class="theme-toggle" type="button" role="switch" aria-label="Dark mode" aria-checked="false" onclick="toggleTheme()"><span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span><span class="theme-icon theme-icon-sun" aria-hidden="true">☀︎</span></button>
+      <button id="theme-toggle" class="theme-toggle" type="button" role="switch" aria-label="Dark mode" aria-checked="false" onclick="toggleTheme()"><span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span><span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span></button>
     </header>
     <div class="card">
       <input id="opp" class="opponent-input" placeholder="Opponent" aria-label="Opponent">
+    </div>
+    <div class="card">
+      <div>Period</div>
+      <div class="period-controls" aria-label="Select period">
+        <button type="button" class="period-button active" data-period="1">P1</button>
+        <button type="button" class="period-button" data-period="2">P2</button>
+        <button type="button" class="period-button" data-period="3">P3</button>
+      </div>
     </div>
     <div class="card">
       <div>Shots</div>
@@ -229,6 +252,9 @@
       <button class="small" onclick="clearHistory()">CLEAR SEASON LOGS</button>
     </div>
     <script>
+      const PERIOD_COUNT = 3;
+      let currentPeriod = 1;
+      let periods = Array.from({ length: PERIOD_COUNT }, () => ({ shots: 0, goals: 0 }));
       let shots = 0, goals = 0;
 
       function applyTheme(isDark) {
@@ -247,34 +273,96 @@
         localStorage.setItem('goalie-tracker-theme', isDark ? 'dark' : 'light');
       }
 
+      function getCurrentPeriodStats() { return periods[currentPeriod - 1]; }
+
+      function syncCurrentPeriodStats() {
+        const stats = getCurrentPeriodStats();
+        shots = stats.shots;
+        goals = stats.goals;
+      }
+
+      function updatePeriodButtons() {
+        document.querySelectorAll('.period-button').forEach((button) => {
+          const isActive = Number(button.dataset.period) === currentPeriod;
+          button.classList.toggle('active', isActive);
+          button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+      }
+
+      function setCurrentPeriod(periodNumber) {
+        currentPeriod = Math.min(Math.max(1, periodNumber), PERIOD_COUNT);
+        syncCurrentPeriodStats();
+        updatePeriodButtons();
+        render();
+      }
+
       function render() {
+        const stats = getCurrentPeriodStats();
+        shots = stats.shots;
+        goals = stats.goals;
         const saves = shots - goals;
         document.getElementById('shots').textContent = shots;
         document.getElementById('goals').textContent = goals;
         document.getElementById('saves').textContent = saves;
         document.getElementById('svp').textContent = shots ? (saves / shots).toFixed(3) : '0.000';
         document.getElementById('add-goal').disabled = goals >= shots;
+        updatePeriodButtons();
         loadHistory();
       }
 
-      function addShot() { shots++; render(); }
-      function addGoal() { if (goals >= shots) return; goals++; render(); }
-      function removeShot() { if (shots > goals) shots--; render(); }
-      function removeGoal() { if (goals > 0) goals--; render(); }
+      function addShot() {
+        const stats = getCurrentPeriodStats();
+        stats.shots++;
+        syncCurrentPeriodStats();
+        render();
+      }
+
+      function addGoal() {
+        const stats = getCurrentPeriodStats();
+        if (stats.goals >= stats.shots) return;
+        stats.goals++;
+        syncCurrentPeriodStats();
+        render();
+      }
+
+      function removeShot() {
+        const stats = getCurrentPeriodStats();
+        if (stats.shots > 0) {
+          stats.shots--;
+          if (stats.goals > stats.shots) stats.goals = stats.shots;
+        }
+        syncCurrentPeriodStats();
+        render();
+      }
+
+      function removeGoal() {
+        const stats = getCurrentPeriodStats();
+        if (stats.goals > 0) stats.goals--;
+        syncCurrentPeriodStats();
+        render();
+      }
+
+      function resetCurrentGame() {
+        periods = Array.from({ length: PERIOD_COUNT }, () => ({ shots: 0, goals: 0 }));
+        currentPeriod = 1;
+        syncCurrentPeriodStats();
+        render();
+      }
 
       function saveGame() {
         const games = JSON.parse(localStorage.getItem('games') || '[]');
+        const gameShots = periods.reduce((total, period) => total + period.shots, 0);
+        const gameGoals = periods.reduce((total, period) => total + period.goals, 0);
         games.push({
           date: new Date().toLocaleDateString(),
           opp: document.getElementById('opp').value || 'Unknown',
-          shots,
-          goals
+          shots: gameShots,
+          goals: gameGoals,
+          periods: periods.map((period, index) => ({ number: index + 1, shots: period.shots, goals: period.goals }))
         });
         localStorage.setItem('games', JSON.stringify(games));
         document.getElementById('opp').value = '';
-        shots = 0;
-        goals = 0;
-        render();
+        resetCurrentGame();
       }
 
       function loadHistory() {
@@ -289,7 +377,9 @@
           const entry = document.createElement('div');
           entry.className = 'game-entry';
           const details = document.createElement('span');
-          details.textContent = `${game.date} - ${game.opp} | ${game.shots} shots, ${game.goals} goals`;
+          const gamePeriods = Array.isArray(game.periods) && game.periods.length ? game.periods : [{ number: 1, shots: game.shots, goals: game.goals }];
+          const perPeriodText = gamePeriods.map(period => `P${period.number}: ${period.shots}/${period.goals}`).join(' · ');
+          details.textContent = `${game.date} - ${game.opp} | ${game.shots} shots, ${game.goals} goals | ${perPeriodText}`;
           const actions = document.createElement('div');
           actions.className = 'game-actions';
           const downloadButton = document.createElement('button');
@@ -313,9 +403,11 @@
       function downloadGameCsv(game) {
         const saves = game.shots - game.goals;
         const savePercentage = game.shots ? (saves / game.shots).toFixed(3) : '0.000';
+        const gamePeriods = Array.isArray(game.periods) && game.periods.length ? game.periods : [{ number: 1, shots: game.shots, goals: game.goals }];
+        const periodHeaders = gamePeriods.flatMap(period => [`P${period.number} Shots`, `P${period.number} Goals`]);
         const rows = [
-          ['Date', 'Opponent', 'Shots', 'Goals', 'Saves', 'Save Percentage'],
-          [game.date, game.opp, game.shots, game.goals, saves, savePercentage]
+          ['Date', 'Opponent', 'Shots', 'Goals', 'Saves', 'Save Percentage', ...periodHeaders],
+          [game.date, game.opp, game.shots, game.goals, saves, savePercentage, ...gamePeriods.flatMap(period => [period.shots, period.goals])]
         ];
         const csv = rows.map(row => row.map(value => {
           const escaped = String(value).replace(/"/g, '""');
@@ -350,6 +442,10 @@
         localStorage.removeItem('games');
         render();
       }
+
+      document.querySelectorAll('.period-button').forEach((button) => {
+        button.addEventListener('click', () => setCurrentPeriod(Number(button.dataset.period)));
+      });
 
       applyTheme(localStorage.getItem('goalie-tracker-theme') === 'dark');
       if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js');
