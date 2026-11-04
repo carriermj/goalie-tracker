@@ -134,6 +134,7 @@
       }
       .theme-icon-moon { color: var(--logo-cream); }
       .theme-icon-sun { color: var(--logo-burgundy); }
+      .theme-icon-sun svg { display: block; width: 17px; height: 17px; margin: auto; }
       .theme-toggle[aria-checked="true"] .theme-icon-moon,
       .theme-toggle[aria-checked="true"] .theme-icon-sun { color: var(--logo-charcoal); }
       .counter-adjustments { display: flex; gap: 8px; }
@@ -210,7 +211,7 @@
     <header class="page-header">
       <img src="logo.png" alt="Dynamik Goaltending logo">
       <h1>Goalie Tracker</h1>
-      <button id="theme-toggle" class="theme-toggle" type="button" role="switch" aria-label="Dark mode" aria-checked="false" onclick="toggleTheme()"><span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span><span class="theme-icon theme-icon-sun" aria-hidden="true">☀</span></button>
+      <button id="theme-toggle" class="theme-toggle" type="button" role="switch" aria-label="Dark mode" aria-checked="false" onclick="toggleTheme()"><span class="theme-icon theme-icon-moon" aria-hidden="true">☾</span><span class="theme-icon theme-icon-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></span></button>
     </header>
     <div class="card">
       <input id="opp" class="opponent-input" placeholder="Opponent" aria-label="Opponent">
