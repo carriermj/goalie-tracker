@@ -147,8 +147,8 @@
         transition: color 240ms ease;
       }
       body.dark-mode .stat { color: var(--logo-gold); }
-      #history { white-space: pre-line; }
-      .game-entry { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+      #history { white-space: pre-line; min-width: 0; }
+      .game-entry { display: flex; align-items: center; gap: 8px; margin: 8px 0; min-width: 0; }
       .game-entry span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
       .delete-game {
         width: auto;
@@ -157,13 +157,14 @@
         margin: 0;
         font-size: 16px;
       }
-      .game-actions { display: flex; flex: 0 0 auto; gap: 6px; }
+      .game-actions { display: flex; flex: 0 1 auto; gap: 6px; flex-wrap: wrap; min-width: 0; }
       .game-actions button {
         width: auto;
-        min-height: 44px;
-        padding: 8px 10px;
+        min-width: 0;
+        min-height: 36px;
+        padding: 6px 8px;
         margin: 0;
-        font-size: 14px;
+        font-size: 12px;
       }
       .period-controls {
         display: grid;
@@ -201,7 +202,8 @@
         .page-header img { width: 60px; height: 60px; }
         .counter-adjustments { gap: 6px; }
         .game-entry { align-items: stretch; flex-direction: column; }
-        .game-actions { justify-content: flex-end; }
+        .game-actions { justify-content: flex-start; }
+        .game-actions button { min-height: 34px; padding: 5px 7px; font-size: 11px; }
       }
       @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after { transition-duration: 0.01ms !important; }
