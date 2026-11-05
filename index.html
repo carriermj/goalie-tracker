@@ -390,13 +390,19 @@
           downloadButton.textContent = 'DOWNLOAD CSV';
           downloadButton.setAttribute('aria-label', `Download CSV for game against ${game.opp} on ${game.date}`);
           downloadButton.addEventListener('click', () => downloadGameCsv(game));
+          const downloadJsonButton = document.createElement('button');
+          downloadJsonButton.className = 'small';
+          downloadJsonButton.type = 'button';
+          downloadJsonButton.textContent = 'DOWNLOAD JSON';
+          downloadJsonButton.setAttribute('aria-label', `Download JSON for game against ${game.opp} on ${game.date}`);
+          downloadJsonButton.addEventListener('click', () => downloadGameJson(game));
           const deleteButton = document.createElement('button');
           deleteButton.className = 'small delete-game';
           deleteButton.type = 'button';
           deleteButton.textContent = 'DELETE';
           deleteButton.setAttribute('aria-label', `Delete game against ${game.opp} on ${game.date}`);
           deleteButton.addEventListener('click', () => deleteGame(index));
-          actions.append(downloadButton, deleteButton);
+          actions.append(downloadButton, downloadJsonButton, deleteButton);
           entry.append(details, actions);
           history.append(entry);
         });
@@ -422,6 +428,31 @@
         const date = String(game.date).replace(/[^\w-]+/g, '-');
         link.href = url;
         link.download = `${opponent}-${date}.csv`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function downloadGameJson(game) {
+        const saves = game.shots - game.goals;
+        const savePercentage = game.shots ? (saves / game.shots).toFixed(3) : '0.000';
+        const gamePeriods = Array.isArray(game.periods) && game.periods.length ? game.periods : [{ number: 1, shots: game.shots, goals: game.goals }];
+        const payload = {
+          date: game.date,
+          opp: game.opp,
+          shots: game.shots,
+          goals: game.goals,
+          saves,
+          savePercentage,
+          periods: gamePeriods
+        };
+        const json = JSON.stringify(payload, null, 2);
+        const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const opponent = String(game.opp).trim().replace(/[^\w-]+/g, '-').replace(/^-|-$/g, '') || 'game';
+        const date = String(game.date).replace(/[^\w-]+/g, '-');
+        link.href = url;
+        link.download = `${opponent}-${date}.json`;
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
