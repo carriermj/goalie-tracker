@@ -147,25 +147,39 @@
         transition: color 240ms ease;
       }
       body.dark-mode .stat { color: var(--logo-gold); }
-      #history { white-space: pre-line; min-width: 0; }
-      .game-entry { display: flex; align-items: center; gap: 8px; margin: 8px 0; min-width: 0; }
-      .game-entry span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-      .delete-game {
-        width: auto;
-        flex: 0 0 auto;
-        padding: 8px 12px;
-        margin: 0;
-        font-size: 16px;
-      }
-      .game-actions { display: flex; flex: 0 1 auto; gap: 6px; flex-wrap: wrap; min-width: 0; }
-      .game-actions button {
-        width: auto;
+      #history { min-width: 0; width: 100%; }
+      .game-entry {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
         min-width: 0;
-        min-height: 36px;
+        margin: 10px 0;
+        padding: 12px;
+        border: 1px solid var(--logo-gold);
+        border-radius: 10px;
+        background: var(--surface-background);
+      }
+      .game-details { flex: 1 1 220px; min-width: 0; overflow-wrap: anywhere; }
+      .game-title { display: block; margin-bottom: 5px; font-weight: bold; line-height: 1.35; }
+      .game-stats, .game-periods { display: block; font-size: 14px; line-height: 1.5; }
+      .game-periods { overflow-wrap: anywhere; }
+      .game-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 6px; }
+      .game-actions button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        width: auto;
+        min-width: 44px;
+        min-height: 40px;
         padding: 6px 8px;
         margin: 0;
+        border: 1px solid transparent;
         font-size: 12px;
       }
+      .export-icon { display: block; width: 18px; height: 18px; flex: 0 0 18px; }
+      .delete-game { min-width: 44px; padding: 6px 8px; font-size: 12px; }
       .period-controls {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -196,14 +210,17 @@
         transition: background-color 240ms ease, color 240ms ease, border-color 240ms ease;
       }
       .opponent-input::placeholder { color: var(--text-color); opacity: 0.7; }
-      @media (max-width: 400px) {
+      @media (max-width: 520px) {
         body { padding: 10px; }
         .card { padding: 12px; }
         .page-header img { width: 60px; height: 60px; }
         .counter-adjustments { gap: 6px; }
-        .game-entry { align-items: stretch; flex-direction: column; }
-        .game-actions { justify-content: flex-start; }
-        .game-actions button { min-height: 34px; padding: 5px 7px; font-size: 11px; }
+        .game-entry { align-items: stretch; flex-direction: column; gap: 10px; }
+        .game-actions { justify-content: flex-start; flex-wrap: wrap; }
+      }
+      @media (max-width: 340px) {
+        .game-actions { gap: 4px; }
+        .game-actions button { min-width: 40px; padding: 5px 6px; }
       }
       @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after { transition-duration: 0.01ms !important; }
@@ -380,23 +397,35 @@
         games.forEach((game, index) => {
           const entry = document.createElement('div');
           entry.className = 'game-entry';
-          const details = document.createElement('span');
+          const details = document.createElement('div');
+          details.className = 'game-details';
+          const title = document.createElement('strong');
+          title.className = 'game-title';
+          title.textContent = `${game.date} · ${game.opp}`;
+          const stats = document.createElement('span');
+          stats.className = 'game-stats';
+          stats.textContent = `${game.shots} shots · ${game.goals} goals · ${game.shots - game.goals} saves`;
           const gamePeriods = Array.isArray(game.periods) && game.periods.length ? game.periods : [{ number: 1, shots: game.shots, goals: game.goals }];
-          const perPeriodText = gamePeriods.map(period => `P${period.number}: ${period.shots}/${period.goals}`).join(' · ');
-          details.textContent = `${game.date} - ${game.opp} | ${game.shots} shots, ${game.goals} goals | ${perPeriodText}`;
+          const periodDetails = document.createElement('span');
+          periodDetails.className = 'game-periods';
+          periodDetails.textContent = gamePeriods.map(period => `P${period.number}: ${period.shots} shots, ${period.goals} goals`).join(' · ');
+          details.append(title, stats, periodDetails);
+
           const actions = document.createElement('div');
           actions.className = 'game-actions';
           const downloadButton = document.createElement('button');
-          downloadButton.className = 'small';
+          downloadButton.className = 'small export-button';
           downloadButton.type = 'button';
-          downloadButton.textContent = 'DOWNLOAD CSV';
-          downloadButton.setAttribute('aria-label', `Download CSV for game against ${game.opp} on ${game.date}`);
+          downloadButton.innerHTML = '<svg class="export-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg><span>CSV</span>';
+          downloadButton.setAttribute('aria-label', `Export game against ${game.opp} on ${game.date} as CSV`);
+          downloadButton.title = 'Export CSV';
           downloadButton.addEventListener('click', () => downloadGameCsv(game));
           const downloadJsonButton = document.createElement('button');
-          downloadJsonButton.className = 'small';
+          downloadJsonButton.className = 'small export-button';
           downloadJsonButton.type = 'button';
-          downloadJsonButton.textContent = 'DOWNLOAD JSON';
-          downloadJsonButton.setAttribute('aria-label', `Download JSON for game against ${game.opp} on ${game.date}`);
+          downloadJsonButton.innerHTML = '<svg class="export-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg><span>JSON</span>';
+          downloadJsonButton.setAttribute('aria-label', `Export game against ${game.opp} on ${game.date} as JSON`);
+          downloadJsonButton.title = 'Export JSON';
           downloadJsonButton.addEventListener('click', () => downloadGameJson(game));
           const deleteButton = document.createElement('button');
           deleteButton.className = 'small delete-game';
