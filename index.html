@@ -404,7 +404,9 @@
           title.textContent = `${game.date} · ${game.opp}`;
           const stats = document.createElement('span');
           stats.className = 'game-stats';
-          stats.textContent = `${game.shots} shots · ${game.goals} goals · ${game.shots - game.goals} saves`;
+          const saves = game.shots - game.goals;
+          const savePercentage = game.shots ? (saves / game.shots).toFixed(3) : '0.000';
+          stats.textContent = `${game.shots} shots · ${game.goals} goals · ${saves} saves · SV% ${savePercentage}`;
           const gamePeriods = Array.isArray(game.periods) && game.periods.length ? game.periods : [{ number: 1, shots: game.shots, goals: game.goals }];
           const periodDetails = document.createElement('span');
           periodDetails.className = 'game-periods';
